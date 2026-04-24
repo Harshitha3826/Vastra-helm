@@ -7,14 +7,25 @@ appVersion: "1.0.0"
 
 dependencies:
   - name: envoy-gateway
+    version: 0.1.0
     repository: file://charts/envoy-gateway
+
   - name: postgresql
+    version: 0.1.0
     repository: file://charts/postgresql
+
   - name: Vastra-user-service
+    version: 0.1.0
     repository: file://charts/Vastra-user-service
+
   - name: Vastra-product-service
+    version: 0.1.0
     repository: file://charts/Vastra-product-service
+
   - name: Vastra-order-service
+    version: 0.1.0
     repository: file://charts/Vastra-order-service
+
   - name: frontend
+    version: 0.1.0
     repository: file://charts/frontend
