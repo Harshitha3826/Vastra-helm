@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: product-service-config
+  name: frontend-service-config
 data:
 {{- range $key, $val := .Values.env }}
   {{ $key }}: {{ $val | quote }}

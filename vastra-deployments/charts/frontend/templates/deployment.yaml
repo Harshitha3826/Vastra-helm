@@ -15,6 +15,10 @@ spec:
       containers:
       - name: frontend-service
         image: {{ .Values.image }}
+        imagePullPolicy: {{ .Values.imagePullPolicy | default "IfNotPresent" }}
+        envFrom:
+        - configMapRef:
+            name: frontend-service-config
         ports:
         - containerPort: {{ .Values.port | default 80 }}
         livenessProbe:
@@ -29,5 +33,7 @@ spec:
             port: {{ .Values.port | default 80 }}
           initialDelaySeconds: 5
           periodSeconds: 5
+{{- if .Values.resources }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
+{{- end }}

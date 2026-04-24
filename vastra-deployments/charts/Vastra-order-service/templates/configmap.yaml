@@ -3,8 +3,6 @@ kind: ConfigMap
 metadata:
   name: order-service-config
 data:
-  NODE_ENV: {{ .Values.env.NODE_ENV | quote }}
-  DB_HOST: "orders-db.default.svc.cluster.local"
-  DB_PORT: "5432"
-  DB_NAME: "orders_db"
-  DB_USER: "postgres"
+{{- range $key, $val := .Values.env }}
+  {{ $key }}: {{ $val | quote }}
+{{- end }}
