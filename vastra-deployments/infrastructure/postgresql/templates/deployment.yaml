@@ -1,0 +1,52 @@
+{{- $dbs := dict "users-db" .Values.usersDb "products-db" .Values.productsDb "orders-db" .Values.ordersDb }}
+{{- range $dbName, $dbConfig := $dbs }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $dbName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ $dbName }}
+  template:
+    metadata:
+      labels:
+        app: {{ $dbName }}
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: {{ $dbName }}-config
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: {{ $dbName }}-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ $dbName }}-secret
+              key: POSTGRES_PASSWORD
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: data
+        emptyDir: {}
+---
+{{- end }}

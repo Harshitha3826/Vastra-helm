@@ -1,0 +1,26 @@
+apiVersion: v2
+name: vastra-deployments
+description: VastraCo microservices e-commerce application
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: envoy-gateway
+    version: 1.0.0
+    repository: "file://infrastructure/envoy-gateway"
+  - name: postgresql
+    version: 1.0.0
+    repository: "file://infrastructure/postgresql"
+  - name: Vastra-user-service
+    version: 1.0.0
+    repository: "file://microservices/Vastra-user-service"
+  - name: Vastra-product-service
+    version: 1.0.0
+    repository: "file://microservices/Vastra-product-service"
+  - name: Vastra-order-service
+    version: 1.0.0
+    repository: "file://microservices/Vastra-order-service"
+  - name: frontend
+    version: 1.0.0
+    repository: "file://microservices/frontend"

@@ -1,0 +1,76 @@
+# Global values for VastraCo deployment
+
+postgresql:
+  usersDb:
+    name: "users_db"
+    user: "postgres"
+    password: "postgrespassword"
+  productsDb:
+    name: "products_db"
+    user: "postgres"
+    password: "postgrespassword"
+  ordersDb:
+    name: "orders_db"
+    user: "postgres"
+    password: "postgrespassword"
+
+Vastra-user-service:
+  image: "vastra/user-service:latest"
+  port: 3001
+  replicas: 1
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+  env:
+    NODE_ENV: "production"
+    JWT_SECRET: "your-super-secret-jwt-key"
+
+Vastra-product-service:
+  image: "vastra/product-service:latest"
+  port: 3002
+  replicas: 1
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+  env:
+    NODE_ENV: "production"
+
+Vastra-order-service:
+  image: "vastra/order-service:latest"
+  port: 3003
+  replicas: 1
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+  env:
+    NODE_ENV: "production"
+    JWT_SECRET: "your-super-secret-jwt-key"
+
+frontend:
+  image: "vastra/frontend:latest"
+  port: 80
+  replicas: 1
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+  hpa:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80

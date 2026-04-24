@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-service-config
+data:
+  NODE_ENV: {{ .Values.env.NODE_ENV | quote }}
+  DB_HOST: "users-db.default.svc.cluster.local"
+  DB_PORT: "5432"
+  # Pulling DB name and user from the global postgresql config isn't possible directly in a subchart 
+  # without global scope, so we assume the defaults defined in the prompt.
+  DB_NAME: "users_db"
+  DB_USER: "postgres"

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: product-service-config
+data:
+  NODE_ENV: {{ .Values.env.NODE_ENV | quote }}
+  DB_HOST: "products-db.default.svc.cluster.local"
+  DB_PORT: "5432"
+  DB_NAME: "products_db"
+  DB_USER: "postgres"

@@ -1,0 +1,15 @@
+{{- $dbs := dict "users-db" .Values.usersDb "products-db" .Values.productsDb "orders-db" .Values.ordersDb }}
+{{- range $dbName, $dbConfig := $dbs }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $dbName }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: {{ $dbName }}
+---
+{{- end }}
