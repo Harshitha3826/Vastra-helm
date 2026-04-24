@@ -4,7 +4,7 @@ metadata:
   name: vastra-routes
 spec:
   parentRefs:
-  - name: vastra-gateway
+  - name: vastra-gateway-{{ .Release.Namespace }}
   rules:
   - matches:
     - path:
