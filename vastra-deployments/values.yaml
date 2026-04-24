@@ -19,12 +19,13 @@ Vastra-user-service:
   replicas: 1
   env:
     NODE_ENV: "production"
-    JWT_SECRET: "your-super-secret-jwt-key"
-    DB_HOST: "users-db"
-    DB_PORT: "5432"
-    DB_NAME: "users_db"
-    DB_USER: "postgres"
-    DB_PASSWORD: "postgrespassword"
+    JWT_SECRET: "vastraco_super_secret_jwt_key_change_in_prod"
+
+    USER_DB_HOST: "users-db"
+    USER_DB_PORT: "5432"
+    USER_DB_NAME: "users_db"
+    USER_DB_USER: "postgres"
+    USER_DB_PASSWORD: "postgrespassword"
 
 Vastra-product-service:
   image: harshithasrinivas03/product-service:latest
@@ -33,11 +34,12 @@ Vastra-product-service:
   replicas: 1
   env:
     NODE_ENV: "production"
-    DB_HOST: "products-db"
-    DB_PORT: "5432"
-    DB_NAME: "products_db"
-    DB_USER: "postgres"
-    DB_PASSWORD: "postgrespassword"
+
+    PRODUCT_DB_HOST: "products-db"
+    PRODUCT_DB_PORT: "5432"
+    PRODUCT_DB_NAME: "products_db"
+    PRODUCT_DB_USER: "postgres"
+    PRODUCT_DB_PASSWORD: "postgrespassword"
 
 Vastra-order-service:
   image: harshithasrinivas03/order-service:latest
@@ -46,12 +48,14 @@ Vastra-order-service:
   replicas: 1
   env:
     NODE_ENV: "production"
-    JWT_SECRET: "your-super-secret-jwt-key"
-    DB_HOST: "orders-db"
-    DB_PORT: "5432"
-    DB_NAME: "orders_db"
-    DB_USER: "postgres"
-    DB_PASSWORD: "postgrespassword"
+    JWT_SECRET: "vastraco_super_secret_jwt_key_change_in_prod"
+
+    ORDER_DB_HOST: "orders-db"
+    ORDER_DB_PORT: "5432"
+    ORDER_DB_NAME: "orders_db"
+    ORDER_DB_USER: "postgres"
+    ORDER_DB_PASSWORD: "postgrespassword"
+
     PRODUCT_SERVICE_URL: "http://product-service:3002"
 
 frontend:
