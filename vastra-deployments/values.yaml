@@ -1,5 +1,3 @@
-# Global values for VastraCo deployment
-
 postgresql:
   usersDb:
     name: "users_db"
@@ -15,60 +13,56 @@ postgresql:
     password: "postgrespassword"
 
 Vastra-user-service:
-  image: "vastra/user-service:latest"
+  image: harshithasrinivas03/user-service:latest
+  imagePullPolicy: Always
   port: 3001
   replicas: 1
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "128Mi"
-    limits:
-      cpu: "500m"
-      memory: "256Mi"
   env:
     NODE_ENV: "production"
     JWT_SECRET: "your-super-secret-jwt-key"
+    DB_HOST: "users-db"
+    DB_PORT: "5432"
+    DB_NAME: "users_db"
+    DB_USER: "postgres"
+    DB_PASSWORD: "postgrespassword"
 
 Vastra-product-service:
-  image: "vastra/product-service:latest"
+  image: harshithasrinivas03/product-service:latest
+  imagePullPolicy: Always
   port: 3002
   replicas: 1
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "128Mi"
-    limits:
-      cpu: "500m"
-      memory: "256Mi"
   env:
     NODE_ENV: "production"
+    DB_HOST: "products-db"
+    DB_PORT: "5432"
+    DB_NAME: "products_db"
+    DB_USER: "postgres"
+    DB_PASSWORD: "postgrespassword"
 
 Vastra-order-service:
-  image: "vastra/order-service:latest"
+  image: harshithasrinivas03/order-service:latest
+  imagePullPolicy: Always
   port: 3003
   replicas: 1
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "128Mi"
-    limits:
-      cpu: "500m"
-      memory: "256Mi"
   env:
     NODE_ENV: "production"
     JWT_SECRET: "your-super-secret-jwt-key"
+    DB_HOST: "orders-db"
+    DB_PORT: "5432"
+    DB_NAME: "orders_db"
+    DB_USER: "postgres"
+    DB_PASSWORD: "postgrespassword"
+    PRODUCT_SERVICE_URL: "http://product-service:3002"
 
 frontend:
-  image: "vastra/frontend:latest"
+  image: harshithasrinivas03/frontend-service:latest
+  imagePullPolicy: Always
   port: 80
   replicas: 1
-  resources:
-    requests:
-      cpu: "100m"
-      memory: "128Mi"
-    limits:
-      cpu: "500m"
-      memory: "256Mi"
+  env:
+    USER_SERVICE_URL: "http://user-service:3001"
+    PRODUCT_SERVICE_URL: "http://product-service:3002"
+    ORDER_SERVICE_URL: "http://order-service:3003"
   hpa:
     enabled: true
     minReplicas: 1
