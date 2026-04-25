@@ -20,8 +20,7 @@ Vastra-user-service:
   env:
     NODE_ENV: "production"
     JWT_SECRET: "vastraco_super_secret_jwt_key_change_in_prod"
-
-    USER_DB_HOST: "users-db"
+    USER_DB_HOST: "users-db-svc.dev.svc.cluster.local"    
     USER_DB_PORT: "5432"
     USER_DB_NAME: "users_db"
     USER_DB_USER: "postgres"
@@ -34,8 +33,7 @@ Vastra-product-service:
   replicas: 1
   env:
     NODE_ENV: "production"
-
-    PRODUCT_DB_HOST: "products-db"
+    PRODUCT_DB_HOST: "products-db-svc.dev.svc.cluster.local"    
     PRODUCT_DB_PORT: "5432"
     PRODUCT_DB_NAME: "products_db"
     PRODUCT_DB_USER: "postgres"
@@ -49,14 +47,12 @@ Vastra-order-service:
   env:
     NODE_ENV: "production"
     JWT_SECRET: "vastraco_super_secret_jwt_key_change_in_prod"
-
-    ORDER_DB_HOST: "orders-db"
+    ORDER_DB_HOST: "orders-db-svc.dev.svc.cluster.local"    
     ORDER_DB_PORT: "5432"
     ORDER_DB_NAME: "orders_db"
     ORDER_DB_USER: "postgres"
     ORDER_DB_PASSWORD: "postgrespassword"
-
-    PRODUCT_SERVICE_URL: "http://product-service:3002"
+    PRODUCT_SERVICE_URL: "http://product-service-svc.dev.svc.cluster.local:3002"   # ← FIXED
 
 frontend:
   image: harshithasrinivas03/frontend-service:latest
@@ -64,9 +60,9 @@ frontend:
   port: 80
   replicas: 1
   env:
-    USER_SERVICE_URL: "http://user-service:3001"
-    PRODUCT_SERVICE_URL: "http://product-service:3002"
-    ORDER_SERVICE_URL: "http://order-service:3003"
+    USER_SERVICE_URL: "http://user-service-svc.dev.svc.cluster.local:3001"      # ← FIXED
+    PRODUCT_SERVICE_URL: "http://product-service-svc.dev.svc.cluster.local:3002"  # ← FIXED
+    ORDER_SERVICE_URL: "http://order-service-svc.dev.svc.cluster.local:3003"     # ← FIXED
   hpa:
     enabled: true
     minReplicas: 1
