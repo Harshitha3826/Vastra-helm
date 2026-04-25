@@ -1,0 +1,21 @@
+dependencies:
+- name: envoy-gateway
+  repository: file://charts/envoy-gateway
+  version: 0.1.0
+- name: postgresql
+  repository: file://charts/postgresql
+  version: 0.1.0
+- name: Vastra-user-service
+  repository: file://charts/Vastra-user-service
+  version: 0.1.0
+- name: Vastra-product-service
+  repository: file://charts/Vastra-product-service
+  version: 0.1.0
+- name: Vastra-order-service
+  repository: file://charts/Vastra-order-service
+  version: 0.1.0
+- name: frontend
+  repository: file://charts/frontend
+  version: 0.1.0
+digest: sha256:fe2a523d7d077f91f4143345e67f06508a09b60d4a685073bb3b3f9cd06dab48
+generated: "2026-04-24T17:50:51.520771504Z"
