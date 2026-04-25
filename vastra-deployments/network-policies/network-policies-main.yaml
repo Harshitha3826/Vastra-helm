@@ -1,0 +1,453 @@
+# Network Policies - Vastra Main Environment
+# Namespace: main
+
+---
+# Default deny all ingress and egress
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: main
+  labels:
+    app.kubernetes.io/part-of: vastra
+    environment: main
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+
+---
+# Gateway: ingress from anywhere on port 80, egress to frontend, backend, K8s API, and DNS
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gateway-netpol
+  namespace: main
+  labels:
+    app.kubernetes.io/part-of: vastra
+    environment: main
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: vastra-gateway
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Accept traffic from anywhere (external LB / NodePort)
+    - ports:
+        - protocol: TCP
+          port: 80
+  egress:
+    # To frontend service
+    - to:
+        - podSelector:
+            matchLabels:
+              app: frontend-service
+      ports:
+        - protocol: TCP
+          port: 3000
+    # To user-service
+    - to:
+        - podSelector:
+            matchLabels:
+              app: user-service
+      ports:
+        - protocol: TCP
+          port: 3001
+    # To product-service
+    - to:
+        - podSelector:
+            matchLabels:
+              app: product-service
+      ports:
+        - protocol: TCP
+          port: 3002
+    # To order-service
+    - to:
+        - podSelector:
+            matchLabels:
+              app: order-service
+      ports:
+        - protocol: TCP
+          port: 3003
+    # To kgateway controller (xDS config) in kgateway-system namespace
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kgateway-system
+      ports:
+        - protocol: TCP
+          port: 9977
+    # To Kubernetes API server (gateway controller needs this)
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 6443
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+---
+# Frontend: ingress from gateway only, egress to kube-dns only
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-netpol
+  namespace: main
+  labels:
+    app.kubernetes.io/part-of: vastra
+    environment: main
+spec:
+  podSelector:
+    matchLabels:
+      app: frontend-service
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: vastra-gateway
+      ports:
+        - protocol: TCP
+          port: 3000
+  egress:
+    # kube-dns only
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+---
+# User Service: ingress from gateway + other backend services, egress to databases and kube-dns
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: user-service-netpol
+  namespace: main
+  labels:
+    app.kubernetes.io/part-of: vastra
+    environment: main
+spec:
+  podSelector:
+    matchLabels:
+      app: user-service
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # From gateway (external traffic)
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: vastra-gateway
+      ports:
+        - protocol: TCP
+          port: 3001
+    # From other backend services (inter-service calls)
+    - from:
+        - podSelector:
+            matchLabels:
+              app: product-service
+      ports:
+        - protocol: TCP
+          port: 3001
+    - from:
+        - podSelector:
+            matchLabels:
+              app: order-service
+      ports:
+        - protocol: TCP
+          port: 3001
+  egress:
+    # To users database
+    - to:
+        - podSelector:
+            matchLabels:
+              app: users-db
+      ports:
+        - protocol: TCP
+          port: 5432
+    # To other backend services (inter-service communication)
+    - to:
+        - podSelector:
+            matchLabels:
+              app: product-service
+      ports:
+        - protocol: TCP
+          port: 3002
+    - to:
+        - podSelector:
+            matchLabels:
+              app: order-service
+      ports:
+        - protocol: TCP
+          port: 3003
+    # kube-dns
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+---
+# Product Service: ingress from gateway + other backend services, egress to databases and kube-dns
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: product-service-netpol
+  namespace: main
+  labels:
+    app.kubernetes.io/part-of: vastra
+    environment: main
+spec:
+  podSelector:
+    matchLabels:
+      app: product-service
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # From gateway (external traffic)
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: vastra-gateway
+      ports:
+        - protocol: TCP
+          port: 3002
+    # From other backend services (inter-service calls)
+    - from:
+        - podSelector:
+            matchLabels:
+              app: user-service
+      ports:
+        - protocol: TCP
+          port: 3002
+    - from:
+        - podSelector:
+            matchLabels:
+              app: order-service
+      ports:
+        - protocol: TCP
+          port: 3002
+  egress:
+    # To products database
+    - to:
+        - podSelector:
+            matchLabels:
+              app: products-db
+      ports:
+        - protocol: TCP
+          port: 5432
+    # To other backend services (inter-service communication)
+    - to:
+        - podSelector:
+            matchLabels:
+              app: user-service
+      ports:
+        - protocol: TCP
+          port: 3001
+    - to:
+        - podSelector:
+            matchLabels:
+              app: order-service
+      ports:
+        - protocol: TCP
+          port: 3003
+    # kube-dns
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+---
+# Order Service: ingress from gateway + other backend services, egress to databases and kube-dns
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: order-service-netpol
+  namespace: main
+  labels:
+    app.kubernetes.io/part-of: vastra
+    environment: main
+spec:
+  podSelector:
+    matchLabels:
+      app: order-service
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # From gateway (external traffic)
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: vastra-gateway
+      ports:
+        - protocol: TCP
+          port: 3003
+    # From other backend services (inter-service calls)
+    - from:
+        - podSelector:
+            matchLabels:
+              app: user-service
+      ports:
+        - protocol: TCP
+          port: 3003
+    - from:
+        - podSelector:
+            matchLabels:
+              app: product-service
+      ports:
+        - protocol: TCP
+          port: 3003
+  egress:
+    # To orders database
+    - to:
+        - podSelector:
+            matchLabels:
+              app: orders-db
+      ports:
+        - protocol: TCP
+          port: 5432
+    # To other backend services (inter-service communication)
+    - to:
+        - podSelector:
+            matchLabels:
+              app: user-service
+      ports:
+        - protocol: TCP
+          port: 3001
+    - to:
+        - podSelector:
+            matchLabels:
+              app: product-service
+      ports:
+        - protocol: TCP
+          port: 3002
+    # kube-dns
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+---
+# Databases: ingress from backend services only, egress to kube-dns only
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: databases-netpol
+  namespace: main
+  labels:
+    app.kubernetes.io/part-of: vastra
+    environment: main
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: users-db
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: user-service
+      ports:
+        - protocol: TCP
+          port: 5432
+  egress:
+    # kube-dns only
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+---
+# Products Database: ingress from product-service only, egress to kube-dns only
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: products-db-netpol
+  namespace: main
+  labels:
+    app.kubernetes.io/part-of: vastra
+    environment: main
+spec:
+  podSelector:
+    matchLabels:
+      app: products-db
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: product-service
+      ports:
+        - protocol: TCP
+          port: 5432
+  egress:
+    # kube-dns only
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+---
+# Orders Database: ingress from order-service only, egress to kube-dns only
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: orders-db-netpol
+  namespace: main
+  labels:
+    app.kubernetes.io/part-of: vastra
+    environment: main
+spec:
+  podSelector:
+    matchLabels:
+      app: orders-db
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: order-service
+      ports:
+        - protocol: TCP
+          port: 5432
+  egress:
+    # kube-dns only
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53

@@ -1,0 +1,170 @@
+# Production Environment Values
+# Namespace: main
+
+# PostgreSQL Database Configuration
+postgresql:
+  usersDb:
+    name: "users_db_prod"
+    user: "postgres"
+    password: "prod_postgres_password_change_me"
+  productsDb:
+    name: "products_db_prod"
+    user: "postgres"
+    password: "prod_postgres_password_change_me"
+  ordersDb:
+    name: "orders_db_prod"
+    user: "postgres"
+    password: "prod_postgres_password_change_me"
+
+# User Service Configuration
+Vastra-user-service:
+  image: harshithasrinivas03/user-service:latest
+  imagePullPolicy: Always
+  port: 3001
+  replicas: 2
+  env:
+    NODE_ENV: "production"
+    JWT_SECRET: "vastraco_production_jwt_secret_change_me"
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 60
+    targetMemoryUtilizationPercentage: 70
+
+# Product Service Configuration
+Vastra-product-service:
+  image: harshithasrinivas03/product-service:latest
+  imagePullPolicy: Always
+  port: 3002
+  replicas: 2
+  env:
+    NODE_ENV: "production"
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 60
+    targetMemoryUtilizationPercentage: 70
+
+# Order Service Configuration
+Vastra-order-service:
+  image: harshithasrinivas03/order-service:latest
+  imagePullPolicy: Always
+  port: 3003
+  replicas: 2
+  env:
+    NODE_ENV: "production"
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 60
+    targetMemoryUtilizationPercentage: 70
+
+# Frontend Service Configuration
+Vastra-frontend-service:
+  image: harshithasrinivas03/frontend-service:latest
+  imagePullPolicy: Always
+  port: 3000
+  replicas: 2
+  env:
+    NODE_ENV: "production"
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 60
+    targetMemoryUtilizationPercentage: 70
+
+# Gateway Configuration
+gateway:
+  enabled: true
+  className: "kgateway"
+  port: 80
+
+# Database Storage Configuration
+storage:
+  className: "nfs-client"
+  size: "5Gi"
+
+# Production-specific settings
+environment: "main"
+debug: false
+
+# Additional production configurations
+affinity:
+  enabled: true
+  topologyKey: "kubernetes.io/hostname"
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Security contexts
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 2000
+
+# Network policies
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: "kgateway-system"
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: "kgateway-system"
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 5432
+
+# Monitoring and logging
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+    port: 9090
+  grafana:
+    enabled: true
+    port: 3000
+
+# Backup configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention: "7d"

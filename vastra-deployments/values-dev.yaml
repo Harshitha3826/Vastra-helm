@@ -1,0 +1,117 @@
+# Development Environment Values
+# Namespace: dev
+
+# PostgreSQL Database Configuration
+postgresql:
+  usersDb:
+    name: "users_db"
+    user: "postgres"
+    password: "postgrespassword"
+  productsDb:
+    name: "products_db"
+    user: "postgres"
+    password: "postgrespassword"
+  ordersDb:
+    name: "orders_db"
+    user: "postgres"
+    password: "postgrespassword"
+
+# User Service Configuration
+Vastra-user-service:
+  image: harshithasrinivas03/user-service:latest
+  imagePullPolicy: Always
+  port: 3001
+  replicas: 1
+  env:
+    NODE_ENV: "development"
+    JWT_SECRET: "vastraco_super_secret_jwt_key_change_in_prod"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  hpa:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 70
+
+# Product Service Configuration
+Vastra-product-service:
+  image: harshithasrinivas03/product-service:latest
+  imagePullPolicy: Always
+  port: 3002
+  replicas: 1
+  env:
+    NODE_ENV: "development"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  hpa:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 70
+
+# Order Service Configuration
+Vastra-order-service:
+  image: harshithasrinivas03/order-service:latest
+  imagePullPolicy: Always
+  port: 3003
+  replicas: 1
+  env:
+    NODE_ENV: "development"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  hpa:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 70
+
+# Frontend Service Configuration
+Vastra-frontend-service:
+  image: harshithasrinivas03/frontend-service:latest
+  imagePullPolicy: Always
+  port: 3000
+  replicas: 1
+  env:
+    NODE_ENV: "development"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  hpa:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 70
+
+# Gateway Configuration
+gateway:
+  enabled: true
+  className: "kgateway"
+  port: 80
+
+# Database Storage Configuration
+storage:
+  className: "nfs-client"
+  size: "1Gi"
+
+# Environment-specific settings
+environment: "dev"
+debug: true
