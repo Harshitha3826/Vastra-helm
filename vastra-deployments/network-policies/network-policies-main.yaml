@@ -30,7 +30,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: vastra-gateway
+      app.kubernetes.io/name: vastra-gateway-main
   policyTypes:
     - Ingress
     - Egress
