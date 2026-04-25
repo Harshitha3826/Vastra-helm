@@ -58,6 +58,7 @@ spec:
       name: users-data
     spec:
       accessModes: ["ReadWriteOnce"]
+      storageClassName: nfs-client
       resources:
         requests:
           storage: 1Gi
