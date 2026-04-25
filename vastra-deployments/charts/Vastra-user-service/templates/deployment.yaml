@@ -23,6 +23,9 @@ spec:
             name: user-service-config
         - secretRef:
             name: user-service-secret
+        env:
+        - name: PORT
+          value: {{ .Values.port | quote }}
         livenessProbe:
           httpGet:
             path: /health
