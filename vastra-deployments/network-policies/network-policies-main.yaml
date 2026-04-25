@@ -118,10 +118,10 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: vastra-gateway
+              app.kubernetes.io/name: vastra-gateway-main
       ports:
         - protocol: TCP
-          port: 3000
+          port: 80
   egress:
     # kube-dns only
     - to: []
@@ -153,7 +153,7 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: vastra-gateway
+              app.kubernetes.io/name: vastra-gateway-main
       ports:
         - protocol: TCP
           port: 3001
@@ -226,7 +226,7 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: vastra-gateway
+              app.kubernetes.io/name: vastra-gateway-main
       ports:
         - protocol: TCP
           port: 3002
@@ -299,7 +299,7 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: vastra-gateway
+              app.kubernetes.io/name: vastra-gateway-main
       ports:
         - protocol: TCP
           port: 3003
