@@ -62,3 +62,25 @@ After deployment, view in ArgoCD UI:
 
 If using HTTPS with token, the repository is connected directly in the Application spec.
 If using SSH, create a repository secret first (see repository-secret.yaml).
+
+
+cd /home/ubuntu/Vastra-helm/vastra-deployments
+
+# First, edit database files to change namespace from dev to main
+# Or use sed to replace namespace: dev with namespace: main
+
+# Create namespace
+kubectl create namespace dev --dry-run=client -o yaml | kubectl apply -f -
+
+# Deploy databases (after editing namespace)
+kubectl apply -f databases/ -n dev
+
+# Delete existing gateway if present
+kubectl delete gateway vastra-gateway-dev -n dev || true
+
+# Deploy individual services
+helm upgrade -i vastra-dev-frontend ./charts/frontend --namespace dev --values values-dev.yaml --wait
+helm upgrade -i vastra-dev-user-service ./charts/Vastra-user-service --namespace dev --values values-dev.yaml --wait
+helm upgrade -i vastra-dev-product-service ./charts/Vastra-product-service --namespace dev --values values-dev.yaml --wait
+helm upgrade -i vastra-dev-order-service ./charts/Vastra-order-service --namespace dev --values values-dev.yaml --wait
+helm upgrade -i vastra-dev-gateway ./charts/envoy-gateway --namespace dev --values values-dev.yaml --wait
