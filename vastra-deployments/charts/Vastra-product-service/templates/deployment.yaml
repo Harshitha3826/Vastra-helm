@@ -23,6 +23,8 @@ spec:
             name: product-service-config
         - secretRef:
             name: product-service-secret
+        - secretRef:
+            name: products-db-secret
         env:
         - name: PORT
           value: {{ .Values.port | quote }}

@@ -23,6 +23,8 @@ spec:
             name: user-service-config
         - secretRef:
             name: user-service-secret
+        - secretRef:
+            name: users-db-secret
         env:
         - name: PORT
           value: {{ .Values.port | quote }}

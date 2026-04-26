@@ -23,6 +23,8 @@ spec:
             name: order-service-config
         - secretRef:
             name: order-service-secret
+        - secretRef:
+            name: orders-db-secret
         env:
         - name: PORT
           value: {{ .Values.port | quote }}
