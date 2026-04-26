@@ -20,11 +20,23 @@ Vastra-user-service:
   env:
     NODE_ENV: "production"
     JWT_SECRET: "vastraco_super_secret_jwt_key_change_in_prod"
-    USER_DB_HOST: "users-db-svc.dev.svc.cluster.local"    
+    USER_DB_HOST: "users-db-svc.dev.svc.cluster.local"
     USER_DB_PORT: "5432"
     USER_DB_NAME: "users_db"
     USER_DB_USER: "postgres"
     USER_DB_PASSWORD: "postgrespassword"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  hpa:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
 
 Vastra-product-service:
   image: harshithasrinivas03/product-service:latest
@@ -33,11 +45,23 @@ Vastra-product-service:
   replicas: 1
   env:
     NODE_ENV: "production"
-    PRODUCT_DB_HOST: "products-db-svc.dev.svc.cluster.local"    
+    PRODUCT_DB_HOST: "products-db-svc.dev.svc.cluster.local"
     PRODUCT_DB_PORT: "5432"
     PRODUCT_DB_NAME: "products_db"
     PRODUCT_DB_USER: "postgres"
     PRODUCT_DB_PASSWORD: "postgrespassword"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  hpa:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
 
 Vastra-order-service:
   image: harshithasrinivas03/order-service:latest
@@ -47,24 +71,44 @@ Vastra-order-service:
   env:
     NODE_ENV: "production"
     JWT_SECRET: "vastraco_super_secret_jwt_key_change_in_prod"
-    ORDER_DB_HOST: "orders-db-svc.dev.svc.cluster.local"    
+    ORDER_DB_HOST: "orders-db-svc.dev.svc.cluster.local"
     ORDER_DB_PORT: "5432"
     ORDER_DB_NAME: "orders_db"
     ORDER_DB_USER: "postgres"
     ORDER_DB_PASSWORD: "postgrespassword"
-    PRODUCT_SERVICE_URL: "http://product-service-svc.dev.svc.cluster.local:3002"   # ← FIXED
+    PRODUCT_SERVICE_URL: "http://product-service.dev.svc.cluster.local:3002"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  hpa:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
 
+# Key: 'frontend' matches the dependency name in Chart.yaml
 frontend:
   image: harshithasrinivas03/frontend-service:latest
   imagePullPolicy: Always
   port: 80
   replicas: 1
   env:
-    USER_SERVICE_URL: "http://user-service-svc.dev.svc.cluster.local:3001"      # ← FIXED
-    PRODUCT_SERVICE_URL: "http://product-service-svc.dev.svc.cluster.local:3002"  # ← FIXED
-    ORDER_SERVICE_URL: "http://order-service-svc.dev.svc.cluster.local:3003"     # ← FIXED
+    USER_SERVICE_URL: "http://user-service.dev.svc.cluster.local:3001"
+    PRODUCT_SERVICE_URL: "http://product-service.dev.svc.cluster.local:3002"
+    ORDER_SERVICE_URL: "http://order-service.dev.svc.cluster.local:3003"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
   hpa:
-    enabled: true
+    enabled: false
     minReplicas: 1
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80
