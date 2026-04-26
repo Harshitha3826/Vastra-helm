@@ -18,7 +18,7 @@ postgresql:
 # Key must match Chart.yaml dependency name: Vastra-user-service
 Vastra-user-service:
   image: harshithasrinivas03/user-service
-  tag: v0.0.4
+  tag: v0.0.5
   imagePullPolicy: Always
   port: 3001
   replicas: 2
