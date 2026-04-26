@@ -1,6 +1,8 @@
 # Production Environment Values
 # Namespace: main
 
+environment: main
+
 # PostgreSQL Database Configuration
 postgresql:
   usersDb:
