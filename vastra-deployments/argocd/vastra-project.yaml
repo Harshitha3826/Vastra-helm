@@ -1,0 +1,51 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: vastra
+  namespace: argocd
+spec:
+  description: Vastra E-commerce Application Project
+  # Allow applications to deploy to these namespaces
+  destinations:
+    - namespace: dev
+      server: https://kubernetes.default.svc
+    - namespace: main
+      server: https://kubernetes.default.svc
+    - namespace: kube-system
+      server: https://kubernetes.default.svc
+  # Allow these resource types
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+    - group: storage.k8s.io
+      kind: StorageClass
+  # Allow these namespaces for namespaced resources
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: "*"
+    - group: apps
+      kind: "*"
+    - group: networking.k8s.io
+      kind: "*"
+    - group: gateway.networking.k8s.io
+      kind: "*"
+    - group: autoscaling
+      kind: "*"
+    - group: bitnami.com
+      kind: SealedSecret
+  # Source repositories allowed
+  sourceRepos:
+    - https://github.com/Harshitha3826/Vastra-helm.git
+    - git@github.com:Harshitha3826/Vastra-helm.git
+  # Roles and permissions
+  roles:
+    - name: admin
+      description: Admin privileges for vastra project
+      policies:
+        - p, proj:vastra:admin, applications, *, vastra/*, allow
+      groups:
+        - administrators

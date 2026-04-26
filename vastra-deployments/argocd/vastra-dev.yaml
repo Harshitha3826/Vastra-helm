@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vastra-dev
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: vastra
+    app.kubernetes.io/component: dev
+    app.kubernetes.io/part-of: vastra-ecommerce
+    environment: dev
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: vastra
+  source:
+    repoURL: https://github.com/Harshitha3826/Vastra-helm.git
+    targetRevision: HEAD
+    path: vastra-deployments
+    helm:
+      valueFiles:
+        - values-dev.yaml
+      parameters:
+        - name: environment
+          value: dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 10
