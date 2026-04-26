@@ -1,20 +1,20 @@
-# Production Environment Values
+# Main Environment Values
 # Namespace: main
 # Deploy: helm upgrade -i vastra-main . -n main --values values-main.yaml
 
 postgresql:
   usersDb:
-    name: "users_db_prod"
+    name: "users_db_main"
     user: "postgres"
-    password: "prod_postgres_password_change_me"
+    password: "main_postgres_password_change_me"
   productsDb:
-    name: "products_db_prod"
+    name: "products_db_main"
     user: "postgres"
-    password: "prod_postgres_password_change_me"
+    password: "main_postgres_password_change_me"
   ordersDb:
-    name: "orders_db_prod"
+    name: "orders_db_main"
     user: "postgres"
-    password: "prod_postgres_password_change_me"
+    password: "main_postgres_password_change_me"
 
 # Key must match Chart.yaml dependency name: Vastra-user-service
 Vastra-user-service:
@@ -24,12 +24,11 @@ Vastra-user-service:
   replicas: 2
   env:
     NODE_ENV: "main"
-    JWT_SECRET: "vastraco_production_jwt_secret_change_me"
+    # DB connection — credentials injected via SealedSecret 'users-db-secret'
     USER_DB_HOST: "users-db-svc.main.svc.cluster.local"
     USER_DB_PORT: "5432"
-    USER_DB_NAME: "users_db_prod"
-    USER_DB_USER: "postgres"
-    USER_DB_PASSWORD: "prod_postgres_password_change_me"
+    USER_DB_NAME: "users_db_main"
+    # JWT_SECRET injected via SealedSecret 'jwt-secret'
   resources:
     requests:
       memory: "256Mi"
@@ -51,11 +50,10 @@ Vastra-product-service:
   replicas: 2
   env:
     NODE_ENV: "main"
+    # DB connection — credentials injected via SealedSecret 'products-db-secret'
     PRODUCT_DB_HOST: "products-db-svc.main.svc.cluster.local"
     PRODUCT_DB_PORT: "5432"
-    PRODUCT_DB_NAME: "products_db_prod"
-    PRODUCT_DB_USER: "postgres"
-    PRODUCT_DB_PASSWORD: "prod_postgres_password_change_me"
+    PRODUCT_DB_NAME: "products_db_main"
   resources:
     requests:
       memory: "256Mi"
@@ -77,12 +75,11 @@ Vastra-order-service:
   replicas: 2
   env:
     NODE_ENV: "main"
-    JWT_SECRET: "vastraco_production_jwt_secret_change_me"
+    # DB connection — credentials injected via SealedSecret 'orders-db-secret'
     ORDER_DB_HOST: "orders-db-svc.main.svc.cluster.local"
     ORDER_DB_PORT: "5432"
-    ORDER_DB_NAME: "orders_db_prod"
-    ORDER_DB_USER: "postgres"
-    ORDER_DB_PASSWORD: "prod_postgres_password_change_me"
+    ORDER_DB_NAME: "orders_db_main"
+    # JWT_SECRET injected via SealedSecret 'jwt-secret'
     PRODUCT_SERVICE_URL: "http://product-service.main.svc.cluster.local:3002"
   resources:
     requests:

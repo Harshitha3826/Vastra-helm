@@ -25,6 +25,8 @@ spec:
             name: user-service-secret
         - secretRef:
             name: users-db-secret
+        - secretRef:
+            name: jwt-secret
         env:
         - name: PORT
           value: {{ .Values.port | quote }}

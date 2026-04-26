@@ -1,20 +1,21 @@
 # Development Environment Values
 # Namespace: dev
 # Deploy: helm upgrade -i vastra-dev . -n dev --values values-dev.yaml
+#
+# NOTE: Sensitive values (JWT_SECRET, DB passwords) are managed by SealedSecrets.
+# Apply SealedSecrets FIRST before deploying:
+#   kubectl apply -f secrets/dev/ -n dev
 
 postgresql:
   usersDb:
     name: "users_db"
     user: "postgres"
-    password: "postgrespassword"
   productsDb:
     name: "products_db"
     user: "postgres"
-    password: "postgrespassword"
   ordersDb:
     name: "orders_db"
     user: "postgres"
-    password: "postgrespassword"
 
 # Key must match Chart.yaml dependency name: Vastra-user-service
 Vastra-user-service:
@@ -24,12 +25,10 @@ Vastra-user-service:
   replicas: 1
   env:
     NODE_ENV: "dev"
-    JWT_SECRET: "vastraco_super_secret_jwt_key_change_in_prod"
+    # DB connection — credentials injected via SealedSecret 'users-db-secret'
     USER_DB_HOST: "users-db-svc.dev.svc.cluster.local"
     USER_DB_PORT: "5432"
     USER_DB_NAME: "users_db"
-    USER_DB_USER: "postgres"
-    USER_DB_PASSWORD: "postgrespassword"
   resources:
     requests:
       memory: "128Mi"
@@ -51,11 +50,10 @@ Vastra-product-service:
   replicas: 1
   env:
     NODE_ENV: "dev"
+    # DB connection — credentials injected via SealedSecret 'products-db-secret'
     PRODUCT_DB_HOST: "products-db-svc.dev.svc.cluster.local"
     PRODUCT_DB_PORT: "5432"
     PRODUCT_DB_NAME: "products_db"
-    PRODUCT_DB_USER: "postgres"
-    PRODUCT_DB_PASSWORD: "postgrespassword"
   resources:
     requests:
       memory: "128Mi"
@@ -77,12 +75,11 @@ Vastra-order-service:
   replicas: 1
   env:
     NODE_ENV: "dev"
-    JWT_SECRET: "vastraco_super_secret_jwt_key_change_in_prod"
+    # DB connection — credentials injected via SealedSecret 'orders-db-secret'
     ORDER_DB_HOST: "orders-db-svc.dev.svc.cluster.local"
     ORDER_DB_PORT: "5432"
     ORDER_DB_NAME: "orders_db"
-    ORDER_DB_USER: "postgres"
-    ORDER_DB_PASSWORD: "postgrespassword"
+    # JWT_SECRET injected via SealedSecret 'jwt-secret'
     PRODUCT_SERVICE_URL: "http://product-service.dev.svc.cluster.local:3002"
   resources:
     requests:

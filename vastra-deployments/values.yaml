@@ -18,7 +18,7 @@ Vastra-user-service:
   port: 3001
   replicas: 1
   env:
-    NODE_ENV: "production"
+    NODE_ENV: "main"
     JWT_SECRET: "vastraco_super_secret_jwt_key_change_in_prod"
     USER_DB_HOST: "users-db-svc.dev.svc.cluster.local"
     USER_DB_PORT: "5432"
@@ -44,7 +44,7 @@ Vastra-product-service:
   port: 3002
   replicas: 1
   env:
-    NODE_ENV: "production"
+    NODE_ENV: "main"
     PRODUCT_DB_HOST: "products-db-svc.dev.svc.cluster.local"
     PRODUCT_DB_PORT: "5432"
     PRODUCT_DB_NAME: "products_db"
@@ -69,7 +69,7 @@ Vastra-order-service:
   port: 3003
   replicas: 1
   env:
-    NODE_ENV: "production"
+    NODE_ENV: "main"
     JWT_SECRET: "vastraco_super_secret_jwt_key_change_in_prod"
     ORDER_DB_HOST: "orders-db-svc.dev.svc.cluster.local"
     ORDER_DB_PORT: "5432"
