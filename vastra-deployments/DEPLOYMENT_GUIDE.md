@@ -12,24 +12,26 @@ This guide explains the deployment architecture for the Vastra e-commerce applic
 vastra-deployments/
 ├── argocd/
 │   ├── vastra-project.yaml          # ArgoCD Project
+│   ├── vastra-secrets-dev.yaml       # Secrets app for dev
+│   ├── vastra-secrets-main.yaml      # Secrets app for main
 │   ├── vastra-dev.yaml               # Main app for dev
 │   ├── vastra-main.yaml              # Main app for main
 │   └── repository-secret.yaml         # Git credentials
-├── charts/                           # Helm charts with SealedSecrets
+├── secrets/
+│   ├── dev/                          # SealedSecrets for dev namespace
+│   │   ├── users-db-secret.yaml
+│   │   ├── products-db-secret.yaml
+│   │   ├── orders-db-secret.yaml
+│   │   └── jwt-secret.yaml
+│   └── main/                         # SealedSecrets for main namespace
+│       ├── users-db-secret.yaml
+│       ├── products-db-secret.yaml
+│       ├── orders-db-secret.yaml
+│       └── jwt-secret.yaml
+├── charts/                           # Helm charts (no SealedSecrets)
 │   ├── Vastra-user-service/
-│   │   └── templates/
-│   │       ├── sealed-secret.yaml    # Users DB SealedSecret (env-aware)
-│   │       ├── jwt-sealed-secret.yaml # JWT SealedSecret (env-aware)
-│   │       ├── deployment.yaml
-│   │       └── ...
 │   ├── Vastra-product-service/
-│   │   └── templates/
-│   │       ├── sealed-secret.yaml    # Products DB SealedSecret (env-aware)
-│   │       └── ...
 │   ├── Vastra-order-service/
-│   │   └── templates/
-│   │       ├── sealed-secret.yaml    # Orders DB SealedSecret (env-aware)
-│   │       └── ...
 │   ├── frontend/
 │   ├── envoy-gateway/
 │   └── postgresql/
@@ -39,8 +41,8 @@ vastra-deployments/
 
 ### Key Features
 
-1. **Environment-Aware SealedSecrets**: SealedSecrets are in Helm chart templates with conditional logic for dev/main environments
-2. **Single ArgoCD App per Environment**: Each environment has one ArgoCD application that deploys everything
+1. **Separate Secrets Applications**: SealedSecrets are deployed via dedicated ArgoCD applications (`vastra-secrets-dev`, `vastra-secrets-main`)
+2. **Helm Charts Clean**: Helm charts only reference secrets, they don't create them
 3. **Automated Sync**: ArgoCD automatically syncs changes from Git
 4. **Namespace Isolation**: Each environment has its own namespace (dev, main)
 
@@ -77,9 +79,30 @@ kubectl delete secret users-db-secret products-db-secret orders-db-secret jwt-se
 kubectl delete secret users-db-secret products-db-secret orders-db-secret jwt-secret -n main
 ```
 
-### Step 4: Apply Main Applications
+### Step 4: Apply Secrets Applications (Apply First!)
 
-The SealedSecrets are included in the Helm charts, so just apply the main applications:
+Secrets must be deployed before the main application:
+
+```bash
+# Apply dev secrets
+kubectl apply -f vastra-deployments/argocd/vastra-secrets-dev.yaml
+
+# Apply main secrets
+kubectl apply -f vastra-deployments/argocd/vastra-secrets-main.yaml
+```
+
+### Step 5: Wait for Secrets to Sync
+
+```bash
+# Watch secrets applications
+kubectl get applications -n argocd -w
+
+# Verify secrets are created
+kubectl get secrets -n dev
+kubectl get secrets -n main
+```
+
+### Step 6: Apply Main Applications
 
 ```bash
 # Apply dev application
@@ -89,7 +112,7 @@ kubectl apply -f vastra-deployments/argocd/vastra-dev.yaml
 kubectl apply -f vastra-deployments/argocd/vastra-main.yaml
 ```
 
-### Step 5: Verify Deployment
+### Step 7: Verify Deployment
 
 ```bash
 # Check application status
@@ -109,6 +132,15 @@ kubectl get svc -n main
 kubectl get secrets -n dev
 kubectl get secrets -n main
 ```
+
+## Application Sync Order
+
+**Critical**: Always deploy in this order:
+
+1. `vastra-secrets-dev` (creates secrets in dev namespace)
+2. `vastra-secrets-main` (creates secrets in main namespace)
+3. `vastra-dev` (deploys app to dev namespace)
+4. `vastra-main` (deploys app to main namespace)
 
 ## Troubleshooting
 
@@ -215,19 +247,31 @@ mv sealed-secret.yaml vastra-deployments/secrets/dev/
 
 ## ArgoCD Application Details
 
+### vastra-secrets-dev
+- **Path**: `vastra-deployments/secrets/dev`
+- **Namespace**: `dev`
+- **Sync Policy**: Automated (prune, self-heal)
+- **Resources**: SealedSecrets only
+
+### vastra-secrets-main
+- **Path**: `vastra-deployments/secrets/main`
+- **Namespace**: `main`
+- **Sync Policy**: Automated (prune, self-heal)
+- **Resources**: SealedSecrets only
+
 ### vastra-dev
 - **Path**: `vastra-deployments`
 - **Namespace**: `dev`
 - **Values File**: `values-dev.yaml`
 - **Sync Policy**: Automated (prune, self-heal)
-- **Resources**: Helm charts including SealedSecrets, Deployments, Services, ConfigMaps, etc.
+- **Resources**: Helm charts (Deployments, Services, ConfigMaps, etc.)
 
 ### vastra-main
 - **Path**: `vastra-deployments`
 - **Namespace**: `main`
 - **Values File**: `values-main.yaml`
 - **Sync Policy**: Automated (prune, self-heal)
-- **Resources**: Helm charts including SealedSecrets, Deployments, Services, ConfigMaps, etc.
+- **Resources**: Helm charts (Deployments, Services, ConfigMaps, etc.)
 
 ## Cleanup
 
@@ -237,6 +281,8 @@ To remove all resources:
 # Delete ArgoCD applications
 kubectl delete application vastra-dev -n argocd
 kubectl delete application vastra-main -n argocd
+kubectl delete application vastra-secrets-dev -n argocd
+kubectl delete application vastra-secrets-main -n argocd
 
 # Delete namespaces (this will delete all resources in the namespace)
 kubectl delete namespace dev
@@ -245,9 +291,9 @@ kubectl delete namespace main
 
 ## Best Practices
 
-1. **Never commit actual secrets** - Only commit SealedSecrets
-2. **Use environment-specific values** - Separate dev and main configurations
-3. **Monitor ArgoCD sync status** - Ensure applications stay in sync
-4. **Test in dev first** - Validate changes in dev before deploying to main
-5. **Use GitOps workflow** - All changes should go through Git
-6. **Delete conflicting secrets** - If ArgoCD shows "Degraded", delete existing secrets
+1. **Always deploy secrets first** - Main applications depend on secrets
+2. **Never commit actual secrets** - Only commit SealedSecrets
+3. **Use environment-specific values** - Separate dev and main configurations
+4. **Monitor ArgoCD sync status** - Ensure applications stay in sync
+5. **Test in dev first** - Validate changes in dev before deploying to main
+6. **Use GitOps workflow** - All changes should go through Git

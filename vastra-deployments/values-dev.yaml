@@ -1,8 +1,6 @@
 # Development Environment Values
 # Namespace: dev
 
-environment: dev
-
 # PostgreSQL Database Configuration
 postgresql:
   usersDb:
