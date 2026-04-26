@@ -69,7 +69,7 @@ Vastra-product-service:
 # Key must match Chart.yaml dependency name: Vastra-order-service
 Vastra-order-service:
   image: harshithasrinivas03/order-service
-  tag: v0.0.4-Dev-branch.0
+  tag: v0.0.4-develop.0
   imagePullPolicy: Always
   port: 3003
   replicas: 1
