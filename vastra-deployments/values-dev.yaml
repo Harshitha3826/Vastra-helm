@@ -19,7 +19,8 @@ postgresql:
 
 # Key must match Chart.yaml dependency name: Vastra-user-service
 Vastra-user-service:
-  image: harshithasrinivas03/user-service:latest
+  image: harshithasrinivas03/user-service
+  tag: latest
   imagePullPolicy: Always
   port: 3001
   replicas: 1
@@ -44,7 +45,8 @@ Vastra-user-service:
 
 # Key must match Chart.yaml dependency name: Vastra-product-service
 Vastra-product-service:
-  image: harshithasrinivas03/product-service:latest
+  image: harshithasrinivas03/product-service
+  tag: latest
   imagePullPolicy: Always
   port: 3002
   replicas: 1
@@ -69,7 +71,8 @@ Vastra-product-service:
 
 # Key must match Chart.yaml dependency name: Vastra-order-service
 Vastra-order-service:
-  image: harshithasrinivas03/order-service:latest
+  image: harshithasrinivas03/order-service
+  tag: latest
   imagePullPolicy: Always
   port: 3003
   replicas: 1
@@ -96,7 +99,8 @@ Vastra-order-service:
 
 # Key must match Chart.yaml dependency name: frontend
 frontend:
-  image: harshithasrinivas03/frontend-service:latest
+  image: harshithasrinivas03/frontend-service
+  tag: latest
   imagePullPolicy: Always
   port: 80
   replicas: 1

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend-service
-        image: {{ .Values.image }}
+        image: {{ .Values.image }}:{{ .Values.tag | default "latest" }}
         imagePullPolicy: {{ .Values.imagePullPolicy | default "IfNotPresent" }}
         envFrom:
         - configMapRef:
