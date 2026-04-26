@@ -135,17 +135,10 @@ deploy_application() {
     print_status "Deploying databases..."
     kubectl apply -f databases/ -n $NAMESPACE
     
-    # Deploy gateway
-    print_status "Deploying gateway..."
-    helm upgrade -i $RELEASE_NAME-gateway charts/envoy-gateway \
-        --namespace $NAMESPACE \
-        --values $VALUES_FILE \
-        --wait \
-        --timeout 10m
-    
     # Deploy main application
     print_status "Deploying application services..."
-    helm upgrade -i $RELEASE_NAME charts/vastra-app \
+    helm dependency build .
+    helm upgrade -i $RELEASE_NAME . \
         --namespace $NAMESPACE \
         --values $VALUES_FILE \
         --wait \
@@ -158,17 +151,10 @@ deploy_application() {
 upgrade_application() {
     print_status "Upgrading $RELEASE_NAME in $NAMESPACE namespace..."
     
-    # Upgrade gateway
-    print_status "Upgrading gateway..."
-    helm upgrade $RELEASE_NAME-gateway charts/envoy-gateway \
-        --namespace $NAMESPACE \
-        --values $VALUES_FILE \
-        --wait \
-        --timeout 10m
-    
     # Upgrade main application
     print_status "Upgrading application services..."
-    helm upgrade $RELEASE_NAME charts/vastra-app \
+    helm dependency build .
+    helm upgrade $RELEASE_NAME . \
         --namespace $NAMESPACE \
         --values $VALUES_FILE \
         --wait \
