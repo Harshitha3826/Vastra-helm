@@ -98,7 +98,7 @@ Vastra-order-service:
 frontend:
   image: harshithasrinivas03/frontend-service:latest
   imagePullPolicy: Always
-  port: 3000
+  port: 80
   replicas: 2
   env:
     NODE_ENV: "main"
