@@ -25,7 +25,7 @@ Vastra-user-service:
   env:
     NODE_ENV: "main"
     # DB connection — credentials injected via SealedSecret 'users-db-secret'
-    USER_DB_HOST: "users-db-svc.main.svc.cluster.local"
+    USER_DB_HOST: "users-db.main.svc.cluster.local"
     USER_DB_PORT: "5432"
     USER_DB_NAME: "users_db_main"
     # JWT_SECRET injected via SealedSecret 'jwt-secret'
@@ -51,7 +51,7 @@ Vastra-product-service:
   env:
     NODE_ENV: "main"
     # DB connection — credentials injected via SealedSecret 'products-db-secret'
-    PRODUCT_DB_HOST: "products-db-svc.main.svc.cluster.local"
+    PRODUCT_DB_HOST: "products-db.main.svc.cluster.local"
     PRODUCT_DB_PORT: "5432"
     PRODUCT_DB_NAME: "products_db_main"
   resources:
@@ -76,7 +76,7 @@ Vastra-order-service:
   env:
     NODE_ENV: "main"
     # DB connection — credentials injected via SealedSecret 'orders-db-secret'
-    ORDER_DB_HOST: "orders-db-svc.main.svc.cluster.local"
+    ORDER_DB_HOST: "orders-db.main.svc.cluster.local"
     ORDER_DB_PORT: "5432"
     ORDER_DB_NAME: "orders_db_main"
     # JWT_SECRET injected via SealedSecret 'jwt-secret'
