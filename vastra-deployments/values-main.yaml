@@ -44,7 +44,7 @@ Vastra-user-service:
 # Key must match Chart.yaml dependency name: Vastra-product-service
 Vastra-product-service:
   image: harshithasrinivas03/product-service
-  tag: v0.0.4
+  tag: v0.0.5
   imagePullPolicy: Always
   port: 3002
   replicas: 2
